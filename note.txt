@@ -1,0 +1,18 @@
+nest new back-end, cd back-end, yarn start:dev
+
+yarn add @nestjs/websockets @nestjs/platform-socket.io socket.io
+
+nest g resource users --no-spec
+
+yarn add prisma @prisma/client
+
+yarn prisma init
+
+yarn prisma db pull
+
+yarn prisma generate
+
+
+
+
+

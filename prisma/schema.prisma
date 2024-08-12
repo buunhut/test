@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model images {
+  imageId   Int         @id @default(autoincrement())
+  imgUrl    Json?
+  isDelete  Boolean?    @default(false)
+  categorys categorys[]
+  users     users[]
+}
+
+model users {
+  userId    Int         @id @default(autoincrement())
+  fullName  String?     @db.VarChar(255)
+  phone     String?     @db.VarChar(20)
+  password  String?     @db.VarChar(255)
+  shopName  String?     @db.VarChar(255)
+  address   String?     @db.Text
+  active    Boolean?    @default(true)
+  isDelete  Boolean?    @default(false)
+  imageId   Int?
+  categorys categorys[]
+  images    images?     @relation(fields: [imageId], references: [imageId], onDelete: NoAction, onUpdate: NoAction, map: "users_ibfk_1")
+
+  @@index([imageId], map: "imageId")
+}
+
+model categorys {
+  categoryId   Int      @id @default(autoincrement())
+  categoryName String?  @db.VarChar(255)
+  active       Boolean? @default(true)
+  isDelete     Boolean? @default(false)
+  userId       Int?
+  imageId      Int?
+  users        users?   @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "categorys_ibfk_1")
+  images       images?  @relation(fields: [imageId], references: [imageId], onDelete: NoAction, onUpdate: NoAction, map: "categorys_ibfk_2")
+
+  @@index([imageId], map: "imageId")
+  @@index([userId], map: "userId")
+}
+
+model country {
+  countryId   Int        @id @default(autoincrement())
+  countryName String?    @db.VarChar(255)
+  isActive    Boolean?   @default(true)
+  isDelete    Boolean?   @default(false)
+  province    province[]
+}
+
+model district {
+  districtId   Int       @id @default(autoincrement())
+  districtName String?   @db.VarChar(255)
+  isActive     Boolean?  @default(true)
+  isDelete     Boolean?  @default(false)
+  provinceId   Int?
+  province     province? @relation(fields: [provinceId], references: [provinceId], onDelete: NoAction, onUpdate: NoAction, map: "district_ibfk_1")
+  ward         ward[]
+
+  @@index([provinceId], map: "provinceId")
+}
+
+model province {
+  provinceId   Int        @id @default(autoincrement())
+  provinceName String?    @db.VarChar(255)
+  isActive     Boolean?   @default(true)
+  isDelete     Boolean?   @default(false)
+  countryId    Int?
+  district     district[]
+  country      country?   @relation(fields: [countryId], references: [countryId], onDelete: NoAction, onUpdate: NoAction, map: "province_ibfk_1")
+
+  @@index([countryId], map: "countryId")
+}
+
+model street {
+  streetId   Int      @id @default(autoincrement())
+  streetName String?  @db.VarChar(255)
+  isActive   Boolean? @default(true)
+  isDelete   Boolean? @default(false)
+  villageId  Int?
+  village    village? @relation(fields: [villageId], references: [villageId], onDelete: NoAction, onUpdate: NoAction, map: "street_ibfk_1")
+
+  @@index([villageId], map: "villageId")
+}
+
+model village {
+  villageId   Int      @id @default(autoincrement())
+  villageName String?  @db.VarChar(255)
+  isActive    Boolean? @default(true)
+  isDelete    Boolean? @default(false)
+  wardId      Int?
+  street      street[]
+  ward        ward?    @relation(fields: [wardId], references: [wardId], onDelete: NoAction, onUpdate: NoAction, map: "village_ibfk_1")
+
+  @@index([wardId], map: "wardId")
+}
+
+model ward {
+  wardId     Int       @id @default(autoincrement())
+  wardName   String?   @db.VarChar(255)
+  isActive   Boolean?  @default(true)
+  isDelete   Boolean?  @default(false)
+  districtId Int?
+  village    village[]
+  district   district? @relation(fields: [districtId], references: [districtId], onDelete: NoAction, onUpdate: NoAction, map: "ward_ibfk_1")
+
+  @@index([districtId], map: "districtId")
+}
+
+model book {
+  bookId    Int      @id @default(autoincrement())
+  bookName  String?  @db.VarChar(255)
+  bookImage String?  @db.VarChar(255)
+  isActive  Boolean? @default(true)
+  isDelete  Boolean? @default(false)
+  classId   Int?
+  page      page[]
+
+  @@index([classId], map: "classId")
+}
+
+model level {
+  levelId   Int       @id @default(autoincrement())
+  levelName String?   @db.VarChar(255)
+  isActive  Boolean?  @default(true)
+  isDelete  Boolean?  @default(false)
+  myclass   myclass[]
+}
+
+model page {
+  pageId      Int      @id @default(autoincrement())
+  pageImage   String?  @db.VarChar(255)
+  pageContent String?  @db.Text
+  isActive    Boolean? @default(true)
+  isDelete    Boolean? @default(false)
+  bookId      Int?
+  book        book?    @relation(fields: [bookId], references: [bookId], onDelete: NoAction, onUpdate: NoAction, map: "page_ibfk_1")
+
+  @@index([bookId], map: "bookId")
+}
+
+model myclass {
+  classId   Int      @id @default(autoincrement())
+  className String?  @db.VarChar(255)
+  isActive  Boolean? @default(true)
+  isDelete  Boolean? @default(false)
+  levelId   Int?
+  level     level?   @relation(fields: [levelId], references: [levelId], onDelete: NoAction, onUpdate: NoAction, map: "myclass_ibfk_1")
+
+  @@index([levelId], map: "levelId")
+}
